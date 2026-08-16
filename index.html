@@ -874,7 +874,11 @@ async function loadFromSupabase(){
   } catch(err){
     setSyncDot('err');
     console.error(err);
-    renderHome(); // render from cache
+    document.getElementById('sec-home').innerHTML=`
+      <div style="padding:20px;color:#E74C3C;font-size:.85rem;">
+        <strong>Error de conexión:</strong><br>${err.message}<br><br>
+        <span style="color:#777">URL: ${SB_URL}</span>
+      </div>`;
   }
 }
 
