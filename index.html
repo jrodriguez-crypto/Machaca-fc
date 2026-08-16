@@ -690,7 +690,7 @@ function selMonto(v,el){
   });
 }
 
-function saveJornada(){
+async function saveJornada(){
   const rival=document.getElementById('j-rival').value.trim();
   if(!rival){alert('Escribe el rival');return;}
   const gm=parseInt(document.getElementById('j-gm').value)||0;
