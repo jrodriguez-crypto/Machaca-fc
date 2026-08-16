@@ -592,7 +592,7 @@ function selAbonoMonto(v,el){
   el.classList.add('active');
   document.getElementById('abonar-monto').value=v;
 }
-function confirmarAbono(){
+async function confirmarAbono(){
   const name=document.getElementById('abonar-monto').dataset.jugador;
   const monto=parseInt(document.getElementById('abonar-monto').value)||0;
   if(!monto){alert('Escribe un monto');return;}
@@ -775,7 +775,7 @@ function openEvento(){
     <div class="check-item"><input type="checkbox" id="ev-${j.name}" value="${j.name}"><label for="ev-${j.name}">${j.name}</label></div>`).join('');
   openModal('evento-overlay');
 }
-function saveEvento(){
+async function saveEvento(){
   const nombre=document.getElementById('ev-nombre').value.trim();
   if(!nombre){alert('Escribe el nombre del evento');return;}
   const asistentes=[...document.querySelectorAll('#ev-checks input:checked')].map(i=>i.value);
@@ -799,14 +799,14 @@ function openNM(){
   document.getElementById('nm-cancha').value=nm.cancha||'';
   openModal('nm-overlay');
 }
-function saveNM(){
+async function saveNM(){
   S.nextMatch={rival:document.getElementById('nm-rival').value.trim(),fecha:document.getElementById('nm-fecha').value,hora:document.getElementById('nm-hora').value,cancha:document.getElementById('nm-cancha').value.trim()};
   save();closeModal('nm-overlay');renderHome();
   await saveNMSB(S.nextMatch);
 }
 
 // ─── JUGADOR NUEVO ────────────────────────────────────────────
-function saveJugador(){
+async function saveJugador(){
   const name=document.getElementById('jug-nombre').value.trim().toUpperCase();
   const num=parseInt(document.getElementById('jug-numero').value)||0;
   if(!name||!num){alert('Completa nombre y número');return;}
