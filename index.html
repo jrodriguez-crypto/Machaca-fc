@@ -829,13 +829,6 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dp=e;docum
 async function loadFromSupabase(){
   setSyncDot('loading');
   try {
-    // Seed jugadores
-    const existingJugs = await sbGet('jugadores','select=id');
-    const existingIds = Array.isArray(existingJugs) ? existingJugs.map(j=>j.id) : [];
-    const toInsert = S.jugadores.filter(j=>!existingIds.includes(j.name.toLowerCase().replace(/ /g,'_')))
-      .map(j=>({id:j.name.toLowerCase().replace(/ /g,'_'), name:j.name, num:j.num, foto:j.foto}));
-    if(toInsert.length) await sbUpsert('jugadores', toInsert);
-
     // Load all data
     const [jugs, jornadas, pagos, eventos, config] = await Promise.all([
       sbGet('jugadores','select=*&order=num.asc'),
