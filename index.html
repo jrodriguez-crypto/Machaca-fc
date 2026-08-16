@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Machaca F.C.</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Machaca FC">
+<meta name="theme-color" content="#8B1A1A">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+:root{
+  --rojo:#8B1A1A;--rojo-vivo:#C0392B;--negro:#111;--gris:#1E1E1E;
+  --gris2:#2A2A2A;--gris3:#333;--blanco:#F5F5F5;--chile:#E74C3C;
+  --oro:#D4AC0D;--verde:#27AE60;--azul:#2980B9;--muted:#777;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;}
+
+/* NAV BOTTOM */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--gris);border-top:2px solid var(--chile);
+  display:flex;z-index:100;
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:8px 4px 10px;cursor:pointer;transition:all .12s;
+  border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;
+}
+.bnav-item.active{color:var(--chile);}
+.bnav-item .bicon{font-size:1.3rem;margin-bottom:2px;}
+.bnav-item .blabel{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+
+/* HEADER */
+header{
+  background:linear-gradient(to right,rgba(0,0,0,.92) 30%,rgba(139,26,26,.6) 100%);
+  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:3px solid var(--chile);
+  position:sticky;top:0;z-index:99;
+}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.1em;display:flex;align-items:center;gap:6px;}
+
+/* SECTIONS */
+.section{display:none;flex:1;overflow-y:auto;padding-bottom:70px;}
+.section.show{display:block;}
+
+/* HOME */
+.home-hero{
+  background:linear-gradient(135deg,var(--rojo) 0%,var(--negro) 100%);
+  padding:20px 16px;margin-bottom:0;
+}
+.home-hero .temporada{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;}
+.home-hero .titulo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.06em;line-height:1;}
+.home-hero .record{font-size:.82rem;color:rgba(255,255,255,.75);margin-top:4px;}
+
+.next-card{
+  margin:12px;background:var(--gris);border-radius:12px;padding:14px;
+  border-left:4px solid var(--oro);position:relative;
+}
+.next-card .label{font-size:.68rem;color:var(--oro);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.next-card .rival{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;}
+.next-card .info{font-size:.78rem;color:var(--muted);margin-top:4px;}
+.next-card .edit-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:var(--blanco);border-radius:6px;padding:4px 9px;font-size:.7rem;cursor:pointer;}
+
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 12px 12px;}
+.stat-pill{background:var(--gris);border-radius:10px;padding:12px 8px;text-align:center;}
+.stat-pill .snum{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--chile);}
+.stat-pill .slbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+
+.section-hdr{padding:0 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.section-hdr h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.07em;color:var(--muted);}
+
+/* BUTTONS */
+.btn-primary{background:var(--chile);border:none;color:var(--blanco);padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .12s;}
+.btn-primary:hover{background:var(--rojo-vivo);}
+.btn-ghost{background:transparent;border:1.5px solid var(--gris3);color:var(--muted);padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;}
+
+/* JUGADOR CARD (lista) */
+.jug-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--gris);border-radius:10px;padding:12px 14px;
+  margin:0 12px 8px;cursor:pointer;transition:background .12s;
+}
+.jug-card:hover{background:var(--gris2);}
+.jug-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--rojo);display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--blanco);
+  flex-shrink:0;overflow:hidden;
+}
+.jug-avatar img{width:100%;height:100%;object-fit:cover;}
+.jug-main{flex:1;}
+.jug-name{font-weight:700;font-size:.9rem;}
+.jug-num{font-size:.72rem;color:var(--muted);}
+.jug-stats{display:flex;gap:8px;margin-top:3px;}
+.jug-stat-badge{font-size:.68rem;color:var(--muted);}
+.jug-deuda{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--chile);}
+.jug-deuda.ok{color:var(--verde);}
+
+/* PERFIL */
+.perfil-header{
+  background:linear-gradient(135deg,var(--rojo) 0%,var(--negro) 100%);
+  padding:20px 16px;display:flex;gap:14px;align-items:center;
+}
+.perfil-avatar{
+  width:72px;height:72px;border-radius:50%;border:3px solid var(--chile);
+  background:var(--gris2);display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;overflow:hidden;flex-shrink:0;cursor:pointer;
+}
+.perfil-avatar img{width:100%;height:100%;object-fit:cover;}
+.perfil-info .pnum{font-size:.7rem;color:rgba(255,255,255,.6);}
+.perfil-info .pname{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;line-height:1.1;}
+.perfil-info .pdeuda{font-size:.82rem;margin-top:4px;}
+.perfil-info .pdeuda.debe{color:var(--chile);}
+.perfil-info .pdeuda.ok{color:var(--verde);}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px;}
+.stat-card{background:var(--gris);border-radius:10px;padding:12px;text-align:center;}
+.stat-card .sn{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;}
+.stat-card .sn.goles{color:var(--chile);}
+.stat-card .sn.puntual{color:var(--oro);}
+.stat-card .sn.asistencia{color:var(--verde);}
+.stat-card .sn.mvp{color:#9B59B6;}
+.stat-card .sn.pagos{color:var(--azul);}
+.stat-card .sl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+
+.historial-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.07em;color:var(--muted);padding:0 12px;margin-bottom:8px;}
+.historial-item{background:var(--gris);border-radius:9px;padding:11px 14px;margin:0 12px 7px;display:flex;justify-content:space-between;align-items:center;}
+.hi-left .hi-concepto{font-size:.82rem;font-weight:600;}
+.hi-left .hi-fecha{font-size:.7rem;color:var(--muted);}
+.hi-right{text-align:right;}
+.hi-monto{font-family:'Bebas Neue',sans-serif;font-size:1rem;}
+.hi-monto.pago{color:var(--verde);}
+.hi-monto.deuda{color:var(--chile);}
+.hi-estado{font-size:.68rem;color:var(--muted);}
+
+/* JORNADAS */
+.jornada-card{background:var(--gris);border-radius:12px;padding:14px;margin:0 12px 10px;border-left:4px solid var(--chile);}
+.jornada-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.jornada-num{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--muted);letter-spacing:.06em;}
+.marcador{display:flex;align-items:center;gap:8px;justify-content:center;padding:8px 0;}
+.eq{text-align:center;flex:1;}
+.eq-name{font-size:.72rem;color:var(--muted);margin-bottom:3px;}
+.eq-goles{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;}
+.vs-txt{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--muted);}
+.res-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.res-badge.w{background:rgba(39,174,96,.2);color:var(--verde);}
+.res-badge.l{background:rgba(192,57,43,.2);color:var(--chile);}
+.res-badge.d{background:rgba(212,172,13,.2);color:var(--oro);}
+.jornada-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.chip{font-size:.67rem;padding:2px 8px;border-radius:20px;font-weight:600;}
+.chip.gol{background:rgba(231,76,60,.2);color:var(--chile);}
+.chip.mvp{background:rgba(155,89,182,.2);color:#9B59B6;}
+
+/* EVENTOS */
+.evento-card{background:var(--gris);border-radius:12px;padding:14px;margin:0 12px 10px;border-left:4px solid var(--oro);}
+.ev-nombre{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;}
+.ev-info{font-size:.73rem;color:var(--muted);margin:3px 0 8px;}
+.ev-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.ev-tag{background:rgba(212,172,13,.15);border:1px solid var(--oro);color:var(--oro);border-radius:20px;padding:2px 9px;font-size:.68rem;font-weight:600;}
+
+/* OVERLAY / MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:var(--gris);border-radius:18px 18px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-hdr{background:var(--rojo);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--chile);border-radius:18px 18px 0 0;position:sticky;top:0;z-index:1;}
+.modal-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;}
+.btn-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1.2rem;cursor:pointer;}
+.modal-body{padding:16px 18px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;background:var(--gris2);border:1.5px solid var(--gris3);border-radius:8px;color:var(--blanco);font-family:'Inter',sans-serif;font-size:.88rem;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--chile);}
+.modal-footer{padding:12px 18px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.marcador-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;}
+.marcador-row .vs-label{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--muted);}
+
+/* CHECK LIST */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.check-item{display:flex;align-items:center;gap:7px;background:var(--gris2);border-radius:7px;padding:7px 10px;cursor:pointer;}
+.check-item input{accent-color:var(--chile);width:15px;height:15px;flex-shrink:0;}
+.check-item label{font-size:.8rem;cursor:pointer;flex:1;}
+
+/* GOLES INPUT LIST */
+.gol-row{display:flex;align-items:center;gap:8px;background:var(--gris2);border-radius:7px;padding:6px 10px;margin-bottom:5px;}
+.gol-row label{flex:1;font-size:.82rem;}
+.gol-row input{width:52px;padding:4px 8px;background:var(--gris3);border:1px solid #444;border-radius:5px;color:var(--blanco);font-size:.82rem;text-align:center;outline:none;}
+
+/* PAGO ROW */
+.pago-row{display:flex;align-items:center;gap:8px;background:var(--gris2);border-radius:7px;padding:6px 10px;margin-bottom:5px;}
+.pago-row label{flex:1;font-size:.82rem;}
+.pago-row input[type=number]{width:80px;padding:4px 8px;background:var(--gris3);border:1px solid #444;border-radius:5px;color:var(--blanco);font-size:.82rem;text-align:center;outline:none;}
+
+.monto-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.monto-btn{flex:1;min-width:55px;padding:7px;border-radius:7px;border:1.5px solid var(--gris3);background:transparent;color:var(--muted);font-weight:700;font-size:.8rem;cursor:pointer;transition:all .12s;}
+.monto-btn.active,.monto-btn:hover{border-color:var(--chile);color:var(--chile);background:rgba(231,76,60,.1);}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-left:6px;}
+.sync-dot.ok{background:#27AE60;}
+.sync-dot.err{background:#E74C3C;}
+.sync-dot.loading{background:var(--oro);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.empty .eicon{font-size:2.5rem;margin-bottom:8px;opacity:.4;}
+
+.btn-del{background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:4px;}
+.btn-del:hover{color:var(--chile);}
+
+#install-banner{display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--rojo);border-top:2px solid var(--chile);color:var(--blanco);padding:10px 14px;align-items:center;gap:10px;z-index:300;}
+#install-banner .it{flex:1;font-size:.8rem;}
+#install-banner .it strong{display:block;color:#F5A0A0;margin-bottom:1px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">🌶️ MACHACA F.C.</div>
+  <div style="font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:4px;">Temporada 2025<div class="sync-dot loading" id="sync-dot"></div></div>
+</header>
+
+<!-- SECTIONS -->
+<div class="section show" id="sec-home"></div>
+<div class="section" id="sec-jugadores"></div>
+<div class="section" id="sec-jornadas"></div>
+<div class="section" id="sec-eventos"></div>
+
+<!-- PERFIL OVERLAY -->
+<div class="overlay" id="perfil-overlay">
+  <div class="modal" id="perfil-modal-content"></div>
+</div>
+
+<!-- MODAL PRÓXIMO PARTIDO -->
+<div class="overlay" id="nm-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Próximo Partido</h2><button class="btn-close" onclick="closeModal('nm-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Rival</label><input id="nm-rival" placeholder="Nombre del rival..."></div>
+      <div class="field"><label>Fecha</label><input id="nm-fecha" type="date"></div>
+      <div class="field"><label>Hora</label><input id="nm-hora" type="time"></div>
+      <div class="field"><label>Cancha</label><input id="nm-cancha" placeholder="Lugar del partido..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('nm-overlay')">Cancelar</button>
+      <button class="btn-primary" onclick="saveNM()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA JORNADA -->
+<div class="overlay" id="jornada-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Nueva Jornada</h2><button class="btn-close" onclick="closeModal('jornada-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Rival</label><input id="j-rival" placeholder="Nombre del rival..."></div>
+      <div class="field"><label>Fecha</label><input id="j-fecha" type="date"></div>
+      <div class="field">
+        <label>Marcador</label>
+        <div class="marcador-row">
+          <input id="j-gm" type="number" min="0" placeholder="0" style="text-align:center;font-size:1.2rem;font-weight:700;">
+          <div class="vs-label">VS</div>
+          <input id="j-gr" type="number" min="0" placeholder="0" style="text-align:center;font-size:1.2rem;font-weight:700;">
+        </div>
+      </div>
+      <div class="field"><label>⚽ Goles (cuántos anotó cada uno)</label><div id="j-goles-list"></div></div>
+      <div class="field"><label>⏰ Llegaron puntuales</label><div class="check-grid" id="j-puntuales"></div></div>
+      <div class="field"><label>✅ Asistieron</label><div class="check-grid" id="j-asistentes"></div></div>
+      <div class="field"><label>🏆 MVP del partido</label><select id="j-mvp"><option value="">— Ninguno —</option></select></div>
+      <div class="field">
+        <label>💰 Arbitraje — monto por jugador</label>
+        <div class="monto-btns">
+          <button class="monto-btn" onclick="selMonto(50,this)">$50</button>
+          <button class="monto-btn" onclick="selMonto(100,this)">$100</button>
+          <button class="monto-btn" onclick="selMonto(150,this)">$150</button>
+          <button class="monto-btn" onclick="selMonto(200,this)">$200</button>
+        </div>
+        <input id="j-monto-arb" type="number" placeholder="O escribe el monto...">
+      </div>
+      <div class="field"><label>💵 ¿Cuánto pagó cada uno? (dejar en 0 si no pagó)</label><div id="j-pagos-list"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('jornada-overlay')">Cancelar</button>
+      <button class="btn-primary" onclick="saveJornada()">Guardar jornada</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO JUGADOR -->
+<div class="overlay" id="jug-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Nuevo Jugador</h2><button class="btn-close" onclick="closeModal('jug-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre / Apodo</label><input id="jug-nombre" placeholder="Apodo..."></div>
+      <div class="field"><label>Número</label><input id="jug-numero" type="number" placeholder="# de camiseta"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('jug-overlay')">Cancelar</button>
+      <button class="btn-primary" onclick="saveJugador()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="overlay" id="evento-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Nuevo Evento</h2><button class="btn-close" onclick="closeModal('evento-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre del evento</label><input id="ev-nombre" placeholder="Ej. Torneo Copa Roja..."></div>
+      <div class="field"><label>Fecha</label><input id="ev-fecha" type="date"></div>
+      <div class="field"><label>Lugar</label><input id="ev-lugar" placeholder="Cancha o dirección..."></div>
+      <div class="field"><label>¿Quiénes van?</label><div class="check-grid" id="ev-checks"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('evento-overlay')">Cancelar</button>
+      <button class="btn-primary" onclick="saveEvento()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ABONAR -->
+<div class="overlay" id="abonar-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Registrar Abono</h2><button class="btn-close" onclick="closeModal('abonar-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div id="abonar-info" style="background:var(--gris2);border-radius:8px;padding:12px;margin-bottom:12px;font-size:.85rem;"></div>
+      <div class="field"><label>Monto a abonar</label>
+        <div class="monto-btns" id="abonar-btns"></div>
+        <input id="abonar-monto" type="number" placeholder="O escribe el monto...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('abonar-overlay')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAbono()">Registrar abono</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav-item active" onclick="showSection('home',this)"><span class="bicon">🏠</span><span class="blabel">Inicio</span></button>
+  <button class="bnav-item" onclick="showSection('jugadores',this)"><span class="bicon">👥</span><span class="blabel">Equipo</span></button>
+  <button class="bnav-item" onclick="showSection('jornadas',this)"><span class="bicon">⚽</span><span class="blabel">Jornadas</span></button>
+  <button class="bnav-item" onclick="showSection('eventos',this)"><span class="bicon">🏆</span><span class="blabel">Eventos</span></button>
+</nav>
+
+<div id="install-banner">
+  <div class="it"><strong>🌶️ Machaca F.C.</strong>Instala la app</div>
+  <button onclick="if(_dp){_dp.prompt();}" style="background:var(--chile);border:none;color:var(--blanco);padding:6px 14px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer;">Instalar</button>
+  <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.1rem;cursor:pointer;">✕</button>
+</div>
+
+<script>
+
+// ─── SUPABASE ─────────────────────────────────────────────────
+const SB_URL='https://ecqyyxiyfghkoliwbcnm.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjcXl5eGl5Zmdoa29saXdiY25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MjgzNDYsImV4cCI6MjEwMjQwNDM0Nn0.TXIo5bTg_vA7AKi8Fmnkv_sXvfP2eYxfcUJWQVia8f0';
+const SB_HDR={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+
+async function sbGet(table,params=''){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}?${params}`,{headers:{...SB_HDR,'Prefer':'return=representation'}});
+  return r.json();
+}
+async function sbUpsert(table,data){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{...SB_HDR,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(data)});
+  return r.json();
+}
+async function sbInsert(table,data){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{...SB_HDR,'Prefer':'return=representation'},body:JSON.stringify(data)});
+  return r.json();
+}
+async function sbDelete(table,filter){
+  await fetch(`${SB_URL}/rest/v1/${table}?${filter}`,{method:'DELETE',headers:SB_HDR});
+}
+async function sbPatch(table,filter,data){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}?${filter}`,{method:'PATCH',headers:{...SB_HDR,'Prefer':'return=representation'},body:JSON.stringify(data)});
+  return r.json();
+}
+
+function setSyncDot(state){
+  const d=document.getElementById('sync-dot');
+  if(!d)return;
+  d.className='sync-dot '+state;
+}
+
+// ─── STATE (local cache) ─────────────────────────────────────
+const DEFAULT_JUGADORES = [
+  {num:7,name:'SANQUI'},{num:10,name:'CEPILLO'},{num:33,name:'ROSITA'},
+  {num:58,name:'PONCHO JAY'},{num:11,name:'MAMADO'},{num:12,name:'LEO'},
+  {num:23,name:'LALO'},{num:17,name:'SENSA'},{num:1,name:'MAYOMAS'},
+  {num:3,name:'RODRIÑO'},{num:5,name:'SAUL'},{num:18,name:'PRIMO'},
+  {num:8,name:'EDGAR'},{num:4,name:'MACUMBA'},{num:24,name:'EDWIN'},
+];
+
+let S = JSON.parse(localStorage.getItem('machaca2') || 'null');
+if(!S) S = {
+  jugadores: DEFAULT_JUGADORES.map(j=>({...j,foto:null})),
+  jornadas: [],
+  eventos: [],
+  nextMatch: null,
+  // pagos: {nombre: [{concepto,cobrado,pagado,fecha}]}
+  pagos: {},
+};
+// migrate
+if(!S.pagos) S.pagos={};
+S.jugadores.forEach(j=>{if(!S.pagos[j.name])S.pagos[j.name]=[];});
+
+function save(){localStorage.setItem('machaca2',JSON.stringify(S));} // local cache
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function fmt(iso){if(!iso)return'';const[y,m,d]=iso.split('-');const ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return`${d} ${ms[+m-1]} ${y}`;}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function openModal(id){document.getElementById(id).classList.add('show');}
+
+function getStats(name){
+  let goles=0,puntual=0,asistencia=0,mvp=0,pagoOk=0;
+  S.jornadas.forEach(j=>{
+    goles+=(j.goles&&j.goles[name])||0;
+    if(j.puntuales&&j.puntuales.includes(name))puntual++;
+    if(j.asistentes&&j.asistentes.includes(name))asistencia++;
+    if(j.mvp===name)mvp++;
+  });
+  // pagos completos
+  (S.pagos[name]||[]).forEach(p=>{if(p.pagado>=p.cobrado)pagoOk++;});
+  return{goles,puntual,asistencia,mvp,pagoOk};
+}
+
+function getDeuda(name){
+  return(S.pagos[name]||[]).reduce((s,p)=>s+(p.cobrado-p.pagado),0);
+}
+
+// ─── NAV ──────────────────────────────────────────────────────
+function showSection(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('show');
+  el.classList.add('active');
+  ({home:renderHome,jugadores:renderJugadores,jornadas:renderJornadas,eventos:renderEventos})[id]?.();
+}
+
+// ─── HOME ─────────────────────────────────────────────────────
+function renderHome(){
+  const g=S.jornadas.filter(j=>j.gm>j.gr).length;
+  const e=S.jornadas.filter(j=>j.gm===j.gr).length;
+  const p=S.jornadas.filter(j=>j.gm<j.gr).length;
+  const nm=S.nextMatch;
+  const pendientes=S.jugadores.filter(j=>getDeuda(j.name)>0);
+
+  document.getElementById('sec-home').innerHTML=`
+    <div class="home-hero">
+      <div class="temporada">Temporada 2025</div>
+      <div class="titulo">MACHACA F.C. 🌶️</div>
+      <div class="record">${g}G · ${e}E · ${p}P · ${S.jornadas.length} jornadas</div>
+    </div>
+    <div class="next-card">
+      <div class="label">Próximo partido</div>
+      <div class="rival">${nm?.rival||'— Sin programar —'}</div>
+      <div class="info">${nm?.fecha?fmt(nm.fecha):''}${nm?.hora?' · '+nm.hora+' hrs':''}${nm?.cancha?' · '+nm.cancha:''}</div>
+      <button class="edit-btn" onclick="openNM()">✏️</button>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-pill"><div class="snum">${g}</div><div class="slbl">Ganados</div></div>
+      <div class="stat-pill"><div class="snum">${e}</div><div class="slbl">Empates</div></div>
+      <div class="stat-pill"><div class="snum">${p}</div><div class="slbl">Perdidos</div></div>
+    </div>
+    <div class="section-hdr"><h3>💰 Deudas pendientes</h3></div>
+    ${pendientes.length===0
+      ?'<div class="empty"><div class="eicon">✅</div><p>Todos al corriente</p></div>'
+      :pendientes.map(j=>`
+        <div class="jug-card" onclick="openPerfil('${j.name}')">
+          <div class="jug-avatar">${j.foto?`<img src="${j.foto}">`:'#'+j.num}</div>
+          <div class="jug-main"><div class="jug-name">${j.name}</div><div class="jug-num">Deuda atrasada</div></div>
+          <div class="jug-deuda">$${getDeuda(j.name)}</div>
+        </div>`).join('')
+    }
+  `;
+}
+
+// ─── JUGADORES ────────────────────────────────────────────────
+function renderJugadores(){
+  const sorted=[...S.jugadores].sort((a,b)=>a.num-b.num);
+  document.getElementById('sec-jugadores').innerHTML=`
+    <div class="section-hdr" style="padding:12px 16px 8px">
+      <h3>👥 Plantilla (${S.jugadores.length})</h3>
+      <button class="btn-primary" onclick="openModal('jug-overlay')">+ Jugador</button>
+    </div>
+    ${sorted.map(j=>{
+      const st=getStats(j.name);
+      const deuda=getDeuda(j.name);
+      return`<div class="jug-card" onclick="openPerfil('${j.name}')">
+        <div class="jug-avatar">${j.foto?`<img src="${j.foto}">`:'#'+j.num}</div>
+        <div class="jug-main">
+          <div class="jug-name">${j.name}</div>
+          <div class="jug-stats">
+            <span class="jug-stat-badge">⚽${st.goles}</span>
+            <span class="jug-stat-badge">🏆${st.mvp}</span>
+            <span class="jug-stat-badge">✅${st.asistencia}</span>
+          </div>
+        </div>
+        <div class="jug-deuda ${deuda<=0?'ok':''}">${deuda>0?'$'+deuda:'✓'}</div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+// ─── PERFIL ───────────────────────────────────────────────────
+function openPerfil(name){
+  const j=S.jugadores.find(x=>x.name===name);
+  if(!j)return;
+  const st=getStats(name);
+  const deuda=getDeuda(name);
+  const historial=S.pagos[name]||[];
+
+  document.getElementById('perfil-modal-content').innerHTML=`
+    <div class="modal-hdr">
+      <h2>Perfil</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-del" onclick="delJugador('${name}')" title="Quitar jugador">🗑️</button>
+        <button class="btn-close" onclick="closeModal('perfil-overlay')">✕</button>
+      </div>
+    </div>
+    <div class="perfil-header">
+      <div class="perfil-avatar" onclick="uploadFoto('${name}')" title="Tap para cambiar foto">
+        ${j.foto?`<img src="${j.foto}">`:'#'+j.num}
+      </div>
+      <div class="perfil-info">
+        <div class="pnum">Núm. ${j.num}</div>
+        <div class="pname">${name}</div>
+        <div class="pdeuda ${deuda>0?'debe':'ok'}">${deuda>0?'Debe $'+deuda:'Al corriente ✓'}</div>
+        ${deuda>0?`<button class="btn-primary" style="margin-top:6px;font-size:.72rem;padding:5px 12px" onclick="openAbonar('${name}')">💵 Registrar abono</button>`:''}
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="sn goles">${st.goles}</div><div class="sl">⚽ Goles</div></div>
+      <div class="stat-card"><div class="sn puntual">${st.puntual}</div><div class="sl">⏰ Puntual</div></div>
+      <div class="stat-card"><div class="sn asistencia">${st.asistencia}</div><div class="sl">✅ Asistencias</div></div>
+      <div class="stat-card"><div class="sn mvp">${st.mvp}</div><div class="sl">🏆 MVP</div></div>
+      <div class="stat-card"><div class="sn pagos">${st.pagoOk}</div><div class="sl">💰 Pagos OK</div></div>
+      <div class="stat-card"><div class="sn" style="color:var(--chile)">${S.jornadas.length-st.asistencia}</div><div class="sl">❌ Faltas</div></div>
+    </div>
+    <div class="historial-title">📋 Historial de pagos</div>
+    ${historial.length===0
+      ?'<div class="empty" style="padding:16px"><p>Sin cobros registrados</p></div>'
+      :[...historial].reverse().map(p=>`
+        <div class="historial-item">
+          <div class="hi-left">
+            <div class="hi-concepto">${p.concepto}</div>
+            <div class="hi-fecha">${fmt(p.fecha)}</div>
+          </div>
+          <div class="hi-right">
+            <div class="hi-monto deuda">-$${p.cobrado}</div>
+            <div class="hi-monto pago">+$${p.pagado}</div>
+            <div class="hi-estado">${p.pagado>=p.cobrado?'✓ Pagado':p.pagado>0?'Parcial':'Pendiente'}</div>
+          </div>
+        </div>`).join('')
+    }
+    <div style="height:20px"></div>
+  `;
+  openModal('perfil-overlay');
+}
+
+function uploadFoto(name){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=async ev=>{
+      const j=S.jugadores.find(x=>x.name===name);
+      if(j){j.foto=ev.target.result;save();await updateFotoSB(name,ev.target.result);openPerfil(name);}
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function openAbonar(name){
+  const deuda=getDeuda(name);
+  document.getElementById('abonar-info').innerHTML=`<strong>${name}</strong> debe <span style="color:var(--chile);font-weight:700">$${deuda}</span>`;
+  const btns=document.getElementById('abonar-btns');
+  btns.innerHTML=[50,100,150,deuda].filter((v,i,a)=>a.indexOf(v)===i&&v>0).map(v=>
+    `<button class="monto-btn" onclick="selAbonoMonto(${v},this)">$${v}</button>`
+  ).join('');
+  document.getElementById('abonar-monto').value='';
+  document.getElementById('abonar-monto').dataset.jugador=name;
+  openModal('abonar-overlay');
+}
+function selAbonoMonto(v,el){
+  document.querySelectorAll('#abonar-btns .monto-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('abonar-monto').value=v;
+}
+function confirmarAbono(){
+  const name=document.getElementById('abonar-monto').dataset.jugador;
+  const monto=parseInt(document.getElementById('abonar-monto').value)||0;
+  if(!monto){alert('Escribe un monto');return;}
+  closeModal('abonar-overlay');
+  await abonarSB(name,monto);
+  openPerfil(name);renderHome();
+}
+
+async function delJugador(name){
+  if(!confirm(`¿Quitar a ${name} del equipo?`))return;
+  closeModal('perfil-overlay');
+  await delJugadorSB(name);
+  renderJugadores();
+}
+
+// ─── JORNADAS ─────────────────────────────────────────────────
+function renderJornadas(){
+  document.getElementById('sec-jornadas').innerHTML=`
+    <div class="section-hdr" style="padding:12px 16px 8px">
+      <h3>⚽ Jornadas (${S.jornadas.length})</h3>
+      <button class="btn-primary" onclick="openJornada()">+ Jornada</button>
+    </div>
+    ${S.jornadas.length===0
+      ?'<div class="empty"><div class="eicon">⚽</div><p>Sin jornadas registradas</p></div>'
+      :[...S.jornadas].reverse().map((j,i)=>{
+        const idx=S.jornadas.length-1-i;
+        const res=j.gm>j.gr?'w':j.gm<j.gr?'l':'d';
+        const resLabel=j.gm>j.gr?'Victoria':j.gm<j.gr?'Derrota':'Empate';
+        const goleadores=j.goles?Object.entries(j.goles).filter(([,g])=>g>0).map(([n,g])=>`<span class="chip gol">⚽ ${n} (${g})</span>`).join(''):'';
+        const mvpChip=j.mvp?`<span class="chip mvp">🏆 ${j.mvp}</span>`:'';
+        return`<div class="jornada-card">
+          <div class="jornada-top">
+            <span class="jornada-num">JORNADA ${idx+1} · ${fmt(j.fecha)}</span>
+            <button class="btn-del" onclick="delJornada(${idx})">✕</button>
+          </div>
+          <div class="marcador">
+            <div class="eq"><div class="eq-name">MACHACA</div><div class="eq-goles">${j.gm}</div></div>
+            <div class="vs-txt">VS</div>
+            <div class="eq"><div class="eq-name">${j.rival}</div><div class="eq-goles">${j.gr}</div></div>
+          </div>
+          <div style="text-align:center"><span class="res-badge ${res}">${resLabel}</span></div>
+          <div class="jornada-chips">${goleadores}${mvpChip}</div>
+        </div>`;
+      }).join('')
+    }
+  `;
+}
+
+function openJornada(){
+  document.getElementById('j-rival').value='';
+  document.getElementById('j-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('j-gm').value='';
+  document.getElementById('j-gr').value='';
+  document.getElementById('j-monto-arb').value='';
+  document.querySelectorAll('.monto-btn').forEach(b=>b.classList.remove('active'));
+
+  const sorted=[...S.jugadores].sort((a,b)=>a.num-b.num);
+
+  // Goles
+  document.getElementById('j-goles-list').innerHTML=sorted.map(j=>`
+    <div class="gol-row">
+      <label>${j.name}</label>
+      <input type="number" min="0" value="0" id="gol-${j.name}">
+    </div>`).join('');
+
+  // Puntuales
+  document.getElementById('j-puntuales').innerHTML=sorted.map(j=>`
+    <div class="check-item"><input type="checkbox" id="pun-${j.name}" value="${j.name}"><label for="pun-${j.name}">${j.name}</label></div>`).join('');
+
+  // Asistentes
+  document.getElementById('j-asistentes').innerHTML=sorted.map(j=>`
+    <div class="check-item"><input type="checkbox" id="asi-${j.name}" value="${j.name}" checked><label for="asi-${j.name}">${j.name}</label></div>`).join('');
+
+  // MVP
+  document.getElementById('j-mvp').innerHTML='<option value="">— Ninguno —</option>'+sorted.map(j=>`<option value="${j.name}">${j.name}</option>`).join('');
+
+  // Pagos
+  document.getElementById('j-pagos-list').innerHTML=sorted.map(j=>`
+    <div class="pago-row">
+      <label>${j.name}</label>
+      <input type="number" min="0" value="0" id="pag-${j.name}" placeholder="$0">
+    </div>`).join('');
+
+  openModal('jornada-overlay');
+}
+
+function selMonto(v,el){
+  document.querySelectorAll('.monto-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('j-monto-arb').value=v;
+  // Auto-fill pagos con ese monto
+  S.jugadores.forEach(j=>{
+    const inp=document.getElementById('pag-'+j.name);
+    if(inp)inp.value=v;
+  });
+}
+
+function saveJornada(){
+  const rival=document.getElementById('j-rival').value.trim();
+  if(!rival){alert('Escribe el rival');return;}
+  const gm=parseInt(document.getElementById('j-gm').value)||0;
+  const gr=parseInt(document.getElementById('j-gr').value)||0;
+  const fecha=document.getElementById('j-fecha').value;
+  const monto=parseInt(document.getElementById('j-monto-arb').value)||0;
+  const mvp=document.getElementById('j-mvp').value;
+
+  const goles={};
+  const puntuales=[...document.querySelectorAll('#j-puntuales input:checked')].map(i=>i.value);
+  const asistentes=[...document.querySelectorAll('#j-asistentes input:checked')].map(i=>i.value);
+
+  S.jugadores.forEach(j=>{
+    const g=parseInt(document.getElementById('gol-'+j.name)?.value)||0;
+    if(g>0)goles[j.name]=g;
+  });
+
+  // Registrar pagos
+  if(monto>0){
+    S.jugadores.forEach(j=>{
+      if(!S.pagos[j.name])S.pagos[j.name]=[];
+      const pagado=parseInt(document.getElementById('pag-'+j.name)?.value)||0;
+      S.pagos[j.name].push({
+        concepto:`Jornada vs ${rival}`,
+        cobrado:monto,
+        pagado:Math.min(pagado,monto),
+        fecha
+      });
+    });
+  }
+
+  // Build pagos data
+  const pagosData = {};
+  if(monto>0){
+    S.jugadores.forEach(j=>{
+      const pagado=parseInt(document.getElementById('pag-'+j.name)?.value)||0;
+      pagosData[j.name]={cobrado:monto, pagado:Math.min(pagado,monto), concepto:`Jornada vs ${rival}`, fecha};
+    });
+  }
+  closeModal('jornada-overlay');
+  await saveJornadaSB({rival,gm,gr,fecha,goles,puntuales,asistentes,mvp}, pagosData);
+  renderJornadas();
+}
+
+async function delJornada(idx){
+  if(!confirm('¿Eliminar esta jornada?'))return;
+  const j=S.jornadas[idx];
+  if(j._id) await delJornadaSB(j._id);
+  else{S.jornadas.splice(idx,1);save();renderJornadas();renderHome();}
+}
+
+// ─── EVENTOS ──────────────────────────────────────────────────
+function renderEventos(){
+  document.getElementById('sec-eventos').innerHTML=`
+    <div class="section-hdr" style="padding:12px 16px 8px">
+      <h3>🏆 Eventos especiales</h3>
+      <button class="btn-primary" onclick="openEvento()">+ Evento</button>
+    </div>
+    ${S.eventos.length===0
+      ?'<div class="empty"><div class="eicon">🏆</div><p>Sin eventos registrados</p></div>'
+      :[...S.eventos].reverse().map((ev,i)=>{
+        const idx=S.eventos.length-1-i;
+        return`<div class="evento-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="ev-nombre">🏆 ${ev.nombre}</div>
+            <button class="btn-del" onclick="delEvento(${idx})">✕</button>
+          </div>
+          <div class="ev-info">${ev.fecha?fmt(ev.fecha):''}${ev.lugar?' · '+ev.lugar:''}</div>
+          <div class="ev-tags">${ev.asistentes.map(a=>`<span class="ev-tag">${a}</span>`).join('')}</div>
+        </div>`;
+      }).join('')
+    }
+  `;
+}
+
+function openEvento(){
+  document.getElementById('ev-nombre').value='';
+  document.getElementById('ev-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ev-lugar').value='';
+  const sorted=[...S.jugadores].sort((a,b)=>a.num-b.num);
+  document.getElementById('ev-checks').innerHTML=sorted.map(j=>`
+    <div class="check-item"><input type="checkbox" id="ev-${j.name}" value="${j.name}"><label for="ev-${j.name}">${j.name}</label></div>`).join('');
+  openModal('evento-overlay');
+}
+function saveEvento(){
+  const nombre=document.getElementById('ev-nombre').value.trim();
+  if(!nombre){alert('Escribe el nombre del evento');return;}
+  const asistentes=[...document.querySelectorAll('#ev-checks input:checked')].map(i=>i.value);
+  closeModal('evento-overlay');
+  await saveEventoSB({nombre,fecha:document.getElementById('ev-fecha').value,lugar:document.getElementById('ev-lugar').value.trim(),asistentes});
+  renderEventos();
+}
+async function delEvento(idx){
+  if(!confirm('¿Eliminar este evento?'))return;
+  const ev=S.eventos[idx];
+  if(ev._id) await delEventoSB(ev._id);
+  else{S.eventos.splice(idx,1);save();renderEventos();}
+}
+
+// ─── PRÓXIMO PARTIDO ──────────────────────────────────────────
+function openNM(){
+  const nm=S.nextMatch||{};
+  document.getElementById('nm-rival').value=nm.rival||'';
+  document.getElementById('nm-fecha').value=nm.fecha||'';
+  document.getElementById('nm-hora').value=nm.hora||'';
+  document.getElementById('nm-cancha').value=nm.cancha||'';
+  openModal('nm-overlay');
+}
+function saveNM(){
+  S.nextMatch={rival:document.getElementById('nm-rival').value.trim(),fecha:document.getElementById('nm-fecha').value,hora:document.getElementById('nm-hora').value,cancha:document.getElementById('nm-cancha').value.trim()};
+  save();closeModal('nm-overlay');renderHome();
+  await saveNMSB(S.nextMatch);
+}
+
+// ─── JUGADOR NUEVO ────────────────────────────────────────────
+function saveJugador(){
+  const name=document.getElementById('jug-nombre').value.trim().toUpperCase();
+  const num=parseInt(document.getElementById('jug-numero').value)||0;
+  if(!name||!num){alert('Completa nombre y número');return;}
+  closeModal('jug-overlay');
+  await saveJugadorSB(name,num);
+  renderJugadores();
+}
+
+// ─── PWA ─────────────────────────────────────────────────────
+const _m={name:"Machaca F.C.",short_name:"Machaca FC",start_url:"./",display:"standalone",background_color:"#111111",theme_color:"#8B1A1A",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%238B1A1A'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='100'%3E%F0%9F%8C%B6%EF%B8%8F%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"}]};
+const _mb=new Blob([JSON.stringify(_m)],{type:'application/json'});
+const _ml=document.createElement('link');_ml.rel='manifest';_ml.href=URL.createObjectURL(_mb);
+document.head.appendChild(_ml);
+const _sw=`const C='machaca-v2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>new Response('')));});`;
+if('serviceWorker' in navigator)navigator.serviceWorker.register(URL.createObjectURL(new Blob([_sw],{type:'application/javascript'}))).catch(()=>{});
+var _dp;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dp=e;document.getElementById('install-banner').style.display='flex';});
+
+// ─── LOAD FROM SUPABASE ───────────────────────────────────────
+async function loadFromSupabase(){
+  setSyncDot('loading');
+  try {
+    // Seed jugadores
+    const existingJugs = await sbGet('jugadores','select=id');
+    const existingIds = Array.isArray(existingJugs) ? existingJugs.map(j=>j.id) : [];
+    const toInsert = S.jugadores.filter(j=>!existingIds.includes(j.name.toLowerCase().replace(/ /g,'_')))
+      .map(j=>({id:j.name.toLowerCase().replace(/ /g,'_'), name:j.name, num:j.num, foto:j.foto}));
+    if(toInsert.length) await sbUpsert('jugadores', toInsert);
+
+    // Load all data
+    const [jugs, jornadas, pagos, eventos, config] = await Promise.all([
+      sbGet('jugadores','select=*&order=num.asc'),
+      sbGet('jornadas','select=*&order=created_at.asc'),
+      sbGet('pagos','select=*&order=created_at.asc'),
+      sbGet('eventos','select=*&order=created_at.desc'),
+      sbGet('config','select=*'),
+    ]);
+
+    if(Array.isArray(jugs)){
+      S.jugadores = jugs.map(j=>({name:j.name, num:j.num, foto:j.foto, _id:j.id}));
+    }
+    if(Array.isArray(jornadas)){
+      S.jornadas = jornadas.map(j=>({
+        _id:j.id, rival:j.rival, fecha:j.fecha, gm:j.gm, gr:j.gr,
+        goles:j.goles||{}, puntuales:j.puntuales||[], asistentes:j.asistentes||[], mvp:j.mvp
+      }));
+    }
+    if(Array.isArray(pagos)){
+      S.pagos={};
+      S.jugadores.forEach(j=>S.pagos[j.name]=[]);
+      pagos.forEach(p=>{
+        const jug=S.jugadores.find(j=>j._id===p.jugador_id);
+        if(jug) S.pagos[jug.name].push({_id:p.id,concepto:p.concepto,cobrado:p.cobrado,pagado:p.pagado,fecha:p.fecha});
+      });
+    }
+    if(Array.isArray(eventos)){
+      S.eventos = eventos.map(e=>({_id:e.id,nombre:e.nombre,fecha:e.fecha,lugar:e.lugar,asistentes:e.asistentes||[]}));
+    }
+    const nmConfig = Array.isArray(config) ? config.find(c=>c.key==='nextMatch') : null;
+    if(nmConfig) S.nextMatch = nmConfig.value;
+
+    save();
+    setSyncDot('ok');
+    renderHome();
+  } catch(err){
+    setSyncDot('err');
+    console.error(err);
+    renderHome(); // render from cache
+  }
+}
+
+// ─── SUPABASE SAVE JORNADA ────────────────────────────────────
+async function saveJornadaSB(jData, pagosData){
+  setSyncDot('loading');
+  try {
+    const jugId = name => S.jugadores.find(j=>j.name===name)?._id || name.toLowerCase().replace(/ /g,'_');
+    const res = await sbInsert('jornadas',[{
+      rival:jData.rival, fecha:jData.fecha, gm:jData.gm, gr:jData.gr,
+      goles:jData.goles, puntuales:jData.puntuales, asistentes:jData.asistentes, mvp:jData.mvp||null
+    }]);
+    const jornadaId = Array.isArray(res) ? res[0]?.id : null;
+
+    // Insert pagos
+    const pagoRows = Object.entries(pagosData).map(([name,{cobrado,pagado,concepto,fecha}])=>({
+      jugador_id: jugId(name), concepto, cobrado, pagado, fecha
+    }));
+    if(pagoRows.length) await sbInsert('pagos', pagoRows);
+
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');console.error(err);}
+}
+
+async function saveJugadorSB(name, num){
+  setSyncDot('loading');
+  try {
+    const id = name.toLowerCase().replace(/ /g,'_');
+    await sbUpsert('jugadores',[{id,name,num,foto:null}]);
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+async function delJornadaSB(id){
+  setSyncDot('loading');
+  try {
+    await sbDelete('jornadas',`id=eq.${id}`);
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+async function saveEventoSB(ev){
+  setSyncDot('loading');
+  try {
+    await sbInsert('eventos',[{nombre:ev.nombre,fecha:ev.fecha,lugar:ev.lugar,asistentes:ev.asistentes}]);
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+async function delEventoSB(id){
+  setSyncDot('loading');
+  try {
+    await sbDelete('eventos',`id=eq.${id}`);
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+async function saveNMSB(nm){
+  setSyncDot('loading');
+  try {
+    await sbUpsert('config',[{key:'nextMatch',value:nm}]);
+    setSyncDot('ok');
+  } catch(err){setSyncDot('err');}
+}
+
+async function abonarSB(name, monto){
+  setSyncDot('loading');
+  try {
+    const pagos = S.pagos[name]||[];
+    let restante = monto;
+    for(let p of pagos){
+      const debe = p.cobrado - p.pagado;
+      if(debe > 0 && restante > 0){
+        const abono = Math.min(debe, restante);
+        const newPagado = p.pagado + abono;
+        await sbPatch('pagos',`id=eq.${p._id}`,{pagado:newPagado});
+        restante -= abono;
+      }
+    }
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+async function updateFotoSB(name, foto){
+  setSyncDot('loading');
+  try {
+    const id = name.toLowerCase().replace(/ /g,'_');
+    await sbPatch('jugadores',`id=eq.${id}`,{foto});
+    setSyncDot('ok');
+  } catch(err){setSyncDot('err');}
+}
+
+async function delJugadorSB(name){
+  setSyncDot('loading');
+  try {
+    const id = name.toLowerCase().replace(/ /g,'_');
+    await sbDelete('jugadores',`id=eq.${id}`);
+    setSyncDot('ok');
+    await loadFromSupabase();
+  } catch(err){setSyncDot('err');}
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+loadFromSupabase();
+</script>
+</body>
+</html>
