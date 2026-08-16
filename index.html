@@ -200,6 +200,16 @@ header{
 .monto-btn.active,.monto-btn:hover{border-color:var(--chile);color:var(--chile);background:rgba(231,76,60,.1);}
 
 .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.tabla-row{display:flex;align-items:center;gap:10px;background:var(--gris);border-radius:10px;padding:11px 14px;margin:0 12px 8px;}
+.tabla-pos{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;min-width:28px;text-align:center;}
+.tabla-pos.gold{color:#FFD700;}
+.tabla-pos.silver{color:#C0C0C0;}
+.tabla-pos.bronze{color:#CD7F32;}
+.tabla-pos.rest{color:var(--muted);}
+.tabla-info{flex:1;}
+.tabla-name{font-weight:700;font-size:.9rem;}
+.tabla-detail{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.tabla-pts{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--chile);}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-left:6px;}
 .sync-dot.ok{background:#27AE60;}
 .sync-dot.err{background:#E74C3C;}
@@ -227,6 +237,9 @@ header{
 <div class="section" id="sec-jugadores"></div>
 <div class="section" id="sec-jornadas"></div>
 <div class="section" id="sec-eventos"></div>
+
+<!-- TABLA SECTION -->
+<div class="section" id="sec-tabla"></div>
 
 <!-- PERFIL OVERLAY -->
 <div class="overlay" id="perfil-overlay">
@@ -344,6 +357,7 @@ header{
   <button class="bnav-item" onclick="showSection('jugadores',this)"><span class="bicon">👥</span><span class="blabel">Equipo</span></button>
   <button class="bnav-item" onclick="showSection('jornadas',this)"><span class="bicon">⚽</span><span class="blabel">Jornadas</span></button>
   <button class="bnav-item" onclick="showSection('eventos',this)"><span class="bicon">🏆</span><span class="blabel">Eventos</span></button>
+  <button class="bnav-item" onclick="showSection('tabla',this)"><span class="bicon">📊</span><span class="blabel">Tabla</span></button>
 </nav>
 
 <div id="install-banner">
@@ -437,7 +451,7 @@ function showSection(id,el){
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('show');
   el.classList.add('active');
-  ({home:renderHome,jugadores:renderJugadores,jornadas:renderJornadas,eventos:renderEventos})[id]?.();
+  ({home:renderHome,jugadores:renderJugadores,jornadas:renderJornadas,eventos:renderEventos,tabla:renderTabla})[id]?.();
 }
 
 // ─── HOME ─────────────────────────────────────────────────────
@@ -978,6 +992,47 @@ async function delJugadorSB(name){
     setSyncDot('ok');
     await loadFromSupabase();
   } catch(err){setSyncDot('err');}
+}
+
+
+// ─── TABLA DE POSICIONES ──────────────────────────────────────
+function renderTabla(){
+  const ranking = S.jugadores.map(j=>{
+    const goles = Object.values(S.jornadas.map(jn=>(jn.goles&&jn.goles[j.name])||0)).reduce((a,b)=>a+b,0);
+    let g=0,mvp=0,asist=0,puntual=0,pagos=0;
+    S.jornadas.forEach(jn=>{
+      g += (jn.goles&&jn.goles[j.name])||0;
+      if(jn.mvp===j.name) mvp++;
+      if(jn.asistentes&&jn.asistentes.includes(j.name)) asist++;
+      if(jn.puntuales&&jn.puntuales.includes(j.name)) puntual++;
+    });
+    (S.pagos[j.name]||[]).forEach(p=>{if(p.pagado>=p.cobrado)pagos++;});
+    const pts = g*1 + mvp*3 + asist*1 + puntual*1 + pagos*1;
+    return{name:j.name,num:j.num,foto:j.foto,pts,g,mvp,asist,puntual,pagos};
+  }).sort((a,b)=>b.pts-a.pts);
+
+  const posColors = ['gold','silver','bronze'];
+  document.getElementById('sec-tabla').innerHTML=`
+    <div class="section-hdr" style="padding:12px 16px 8px">
+      <h3>📊 Tabla de posiciones</h3>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:6px 14px 10px;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">
+      <span style="margin-left:38px">Jugador</span>
+      <span>⚽G &nbsp; 🏆MVP &nbsp; ✅Asi &nbsp; PTS</span>
+    </div>
+    ${ranking.map((j,i)=>`
+      <div class="tabla-row">
+        <div class="tabla-pos ${posColors[i]||'rest'}">${i+1}</div>
+        <div class="jug-avatar" style="width:36px;height:36px;font-size:.9rem;flex-shrink:0">
+          ${j.foto?`<img src="${j.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:'#'+j.num}
+        </div>
+        <div class="tabla-info">
+          <div class="tabla-name">${j.name}</div>
+          <div class="tabla-detail">⚽${j.g} · 🏆${j.mvp} · ✅${j.asist} · ⏰${j.puntual} · 💰${j.pagos}</div>
+        </div>
+        <div class="tabla-pts">${j.pts}<span style="font-size:.6rem;color:var(--muted)"> pts</span></div>
+      </div>`).join('')}
+  `;
 }
 
 // ─── INIT ─────────────────────────────────────────────────────
